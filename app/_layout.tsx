@@ -1,19 +1,42 @@
-import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
-import { useFonts } from 'expo-font';
-import { Stack } from 'expo-router';
-import * as SplashScreen from 'expo-splash-screen';
-import { useEffect } from 'react';
-import 'react-native-reanimated';
+import React from "react";
+import { View } from "react-native";
+import { ApolloProvider } from "@apollo/client";
+import { useFonts } from "expo-font";
+import { Stack } from "expo-router";
+import * as SplashScreen from "expo-splash-screen";
+import { useEffect } from "react";
+import "react-native-reanimated";
+import { useApolloClient } from "@/hooks/useApolloClient";
+// import { PaperProvider, Button } from "react-native-paper";
+import { CustomLightTheme } from "./screens/theme";
+import {
+  NavigationContainer,
+  DefaultTheme as NavigationDefaultTheme,
+  DarkTheme as NavigationDarkTheme,
+} from '@react-navigation/native';
+import {
+  MD3DarkTheme as PaperDarkTheme,
+  MD3LightTheme as PaperDefaultTheme,
+  Provider as PaperProvider,
+} from 'react-native-paper';
 
-import { useColorScheme } from '@/hooks/useColorScheme';
+const CombinedDefaultTheme = {
+  ...PaperDefaultTheme,
+  ...NavigationDefaultTheme,
+};
+const CombinedDarkTheme = { ...PaperDarkTheme, ...NavigationDarkTheme };
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
-  const colorScheme = useColorScheme();
+  // const [isDarkTheme, setIsDarkTheme] = React.useState(false);
+
+  // const theme = isDarkTheme ? CombinedDarkTheme : CombinedDefaultTheme; 
+  const { client } = useApolloClient();
+
   const [loaded] = useFonts({
-    SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
+    SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
   });
 
   useEffect(() => {
@@ -26,12 +49,19 @@ export default function RootLayout() {
     return null;
   }
 
+  if (!client) {
+    return null;
+  }
+
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="+not-found" />
-      </Stack>
-    </ThemeProvider>
+    <PaperProvider theme={CustomLightTheme}>
+      <ApolloProvider client={client}>
+        <Stack>
+          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+          <Stack.Screen name="+not-found" />
+        </Stack>
+      </ApolloProvider>
+    </PaperProvider>
   );
 }
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        
